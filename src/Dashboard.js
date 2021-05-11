@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios'
 import Movie from './Movie'
@@ -15,7 +15,7 @@ const useStyles = makeStyles({
         margin: '30px',
         background: '#FBF7ED',
         border: 0,
-        borderRadius: 3,
+        borderRadius: 10,
         color: '#014D40',
         height: 100,
         padding: '30px',
@@ -25,12 +25,14 @@ const useStyles = makeStyles({
         color: '#014D40',
         margin: '10px',
         padding: '30px',
+        borderRadius: 10,
     },
     nominations: {
         background: '#FBF7ED',
         color: '#014D40',
         margin: '10px',
         padding: '30px',
+        borderRadius: 10,
     },
     search: {
         width: '200px',
@@ -39,13 +41,22 @@ const useStyles = makeStyles({
         border: 0,
         paddingLeft: '10px',
     },
+    limitWarning: {
+        background: '#D82C0D',
+        width: '80%',
+        height: '20px',
+        padding: '15px',
+        color: '#ffffff',
+        borderRadius: '5px',
+    }
 });
 
-const Movies = () => {
+const Dashboard = () => {
     const classes = useStyles();
     const [movieList, setMovieList] = useState({});
+    const [reachedLimit, setReachedLimit] = useState(false);
     const [nomineeList, setNomineeList] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('s');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
     });
@@ -59,22 +70,29 @@ const Movies = () => {
     }
     
     function handleNominees(item){
-        if (!nomineeList.includes(item)){
-            setNomineeList([...nomineeList, item])
+        if (nomineeList.length === 5){
+            setReachedLimit(true);
+        }
+        else {
+            if (!nomineeList.includes(item)){
+                setNomineeList([...nomineeList, item])
+            }
         }
     }
-
     
     function handleDelete(item){
+        if (nomineeList.length === 5 ){
+            setReachedLimit(false);
+        }
         setNomineeList(nomineeList.filter(nominee => nominee !== item))
     }
-
 
     return(
         <>
             <h1>The Shoppies</h1>
+            { reachedLimit && <Box className={classes.limitWarning}>You have reached the 5 nomination limit. Remove a film to nominate new ones</Box>}
             <Grid className={classes.searchBar}>
-                <h1>Movies Title</h1>
+                <h1>Search for Movies</h1>
                 <input 
                     type="text"
                     className={classes.search}
@@ -85,7 +103,8 @@ const Movies = () => {
             </Grid>
             <Grid container className={classes.root}>
                 <Grid className={classes.results} md={5}>
-                    <h1>Results for "{searchQuery}"</h1>
+                    <h1>Movies</h1>
+                    {searchQuery !== "" && <h4>Results for "{searchQuery}"</h4>}
                     {movieList && Object.values(movieList).map((item,i) => 
                         <Movie item={item} i={i} nomineeList={nomineeList} handleNominees={handleNominees}></Movie>
                     )}
@@ -101,4 +120,4 @@ const Movies = () => {
     );
 };
 
-export default Movies;
+export default Dashboard;

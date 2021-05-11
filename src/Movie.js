@@ -32,8 +32,7 @@ const Movie = (props) => {
                     className={classes.button}
                     disabled
                     variant="contained" 
-                    color="primary"
-                    onClick={() => props.handleNominees(item)}>
+                    color="primary">
                         Nominate
                 </Button>
                 : 
